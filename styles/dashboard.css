@@ -97,6 +97,11 @@ body {
 
 /* Table */
 
+.table-wrap {
+    overflow: auto;
+    width: 100%;
+}
+
 table {
     border-collapse: collapse;
     width: 100%;

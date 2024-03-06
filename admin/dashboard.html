@@ -5,6 +5,63 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Mahir Blog - Dashboard</title>
         <link rel="stylesheet" href="../styles/dashboard.css" />
+        <style>
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                left: 0;
+                padding: 20px 0px;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgb(0, 0, 0);
+                background-color: rgba(0, 0, 0, 0.4);
+            }
+
+            .modal-content {
+                background-color: #fefefe;
+                margin: auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                border-radius: 4px;
+            }
+
+            .close {
+                color: #aaaaaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .edit-form {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .edit-form input,
+            textarea {
+                padding: 10px 13px;
+                border-radius: 4px;
+                border: none;
+                background-color: #eeeeee;
+            }
+
+            .edit-form input[type="submit"] {
+                background-color: #6246ea;
+                color: white;
+            }
+        </style>
     </head>
     <body>
         <div id="sidebar">
@@ -29,26 +86,61 @@
             <div>
                 <!-- Konten Dashboard -->
                 <h1>Selamat Datang di Dashboard</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Judul</th>
-                            <th>Artikel</th>
-                            <th>Penulis</th>
-                            <th>Tanggal</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="row-data">
-                        <!-- Contoh data -->
 
-                        <!-- tambahkan baris sesuai kebutuhan -->
-                    </tbody>
-                </table>
+                <!-- Modal Content -->
+                <div id="modal" class="modal">
+                    <div class="modal-content">
+                        <span onclick="closeModal()" class="close"
+                            >&times;</span
+                        >
+                        <h2>Edit Artikel</h2>
+                        <form id="articleForm" class="edit-form">
+                            <label for="title">Judul</label>
+                            <input type="text" name="title" id="title" />
+                            <label for="author">Penulis</label>
+                            <input type="text" name="author" id="author" />
+                            <label for="date">Tanggal</label>
+                            <input type="date" name="date" id="date" />
+                            <label for="article">Artikel</label>
+                            <textarea
+                                name="article"
+                                id="article"
+                                cols="30"
+                                rows="10"></textarea>
+                            <input
+                                type="submit"
+                                onclick="saveEditedArticle()"
+                                value="Update Artikel" />
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Table Content -->
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Judul</th>
+                                <th>Artikel</th>
+                                <th>Penulis</th>
+                                <th>Tanggal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="row-data">
+                            <!-- Contoh data -->
+
+                            <!-- tambahkan baris sesuai kebutuhan -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <script>
+            const modal = document.getElementById("modal");
+            let editedIndex = -1;
+
             document.addEventListener("DOMContentLoaded", () => {
                 renderArticles();
             });
@@ -110,20 +202,69 @@
                 window.location.href = "../auth/login.html";
             }
 
-            function editRow() {
-                // Logika untuk mengedit baris
-                console.log("Edit button clicked");
+            // Modal Edit Article
+
+            function editArticle(index) {
+                // Logika untuk mengedit artikel
+                modal.style.display = "block";
+
+                const articles = getArticlesFromLocalStorage();
+                editedIndex = index;
+                const editedArticle = articles[editedIndex];
+
+                document.getElementById("title").value = editedArticle.title;
+                document.getElementById("author").value = editedArticle.author;
+                document.getElementById("date").value = editedArticle.date;
+                document.getElementById("article").value =
+                    editedArticle.article;
             }
 
-            function deleteRow() {
-                // Logika untuk menghapus baris
-                console.log("Delete button clicked");
+            function saveEditedArticle() {
+                const editedTitle = document.getElementById("title").value;
+                const editedAuthor = document.getElementById("author").value;
+                const editedDate = document.getElementById("date").value;
+                const editedArticle = document.getElementById("article").value;
+
+                if (
+                    editedTitle.trim() !== "" &&
+                    editedAuthor.trim() !== "" &&
+                    editedDate.trim() !== "" &&
+                    editedArticle.trim() !== ""
+                ) {
+                    const articles = getArticlesFromLocalStorage();
+                    articles[editedIndex] = {
+                        title: editedTitle,
+                        author: editedAuthor,
+                        date: editedDate,
+                        article: editedArticle,
+                    };
+                    saveArticlesToLocalStorage(articles);
+
+                    renderArticles();
+                    closeModal();
+                    alert("Artikel berhasil diupdate");
+                } else {
+                    alert("Inputan tidak boleh kosong!");
+                }
             }
 
+            function closeModal() {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            };
+
+            // Fetch Article From Local Storage
             function getArticlesFromLocalStorage() {
                 const articlesJSON = localStorage.getItem("articles");
                 return articlesJSON ? JSON.parse(articlesJSON) : [];
             }
+
+            // Content Loaded
 
             document.addEventListener("DOMContentLoaded", () => {
                 const sessionUser = getUserFromSession();
