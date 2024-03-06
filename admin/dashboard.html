@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mahir Blog - Dashboard</title>
+        <link rel="stylesheet" href="../styles/dashboard.css" />
+    </head>
+    <body>
+        <div id="sidebar">
+            <a href="../index.html"><h2>Mahir Blog</h2></a>
+            <a href="./dashboard.html">Beranda</a>
+            <a href="./add.html">Tulis Artikel</a>
+            <a href="#">Setting</a>
+            <a href="#" onclick="logout()" class="btn-logout">Logout</a>
+        </div>
+
+        <div id="content">
+            <div id="navbar">
+                <div class="toggle-btn" onclick="toggleSidebar()">&#9776;</div>
+                <div class="right">
+                    <input type="text" placeholder="Cari..." />
+                    <div id="logout-btn" onclick="logout()">Logout</div>
+                    <span
+                        >Anda login sebagai, <span id="user">Akram</span></span
+                    >
+                </div>
+            </div>
+            <div>
+                <!-- Konten Dashboard -->
+                <h1>Selamat Datang di Dashboard</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Artikel</th>
+                            <th>Penulis</th>
+                            <th>Tanggal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="row-data">
+                        <!-- Contoh data -->
+
+                        <!-- tambahkan baris sesuai kebutuhan -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                renderArticles();
+            });
+
+            function renderArticles() {
+                const rowData = document.getElementById("row-data");
+
+                const articles = getArticlesFromLocalStorage();
+
+                rowData.innerHTML = "";
+
+                articles.forEach((article, index) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                    <td>${article.title}</td>
+                    <td>${article.article}</td>
+                    <td>${article.author}</td>
+                    <td>${article.date}</td>
+                    <td><button onclick="editArticle(${index})">Edit</button><button onclick="deleteArticle(${index})">Delete</button></td>
+                    `;
+
+                    rowData.append(tr);
+                });
+
+                console.log(articles);
+            }
+
+            function deleteArticle(index) {
+                const articles = getArticlesFromLocalStorage();
+                if (confirm("Apakah anda yakin ingin menghapus artikel ini?")) {
+                    articles.splice(index, 1);
+                }
+
+                saveArticlesToLocalStorage(articles);
+            }
+
+            function saveArticlesToLocalStorage(articles) {
+                localStorage.setItem("articles", JSON.stringify(articles));
+            }
+
+            function toggleSidebar() {
+                const sidebar = document.getElementById("sidebar");
+                const content = document.getElementById("content");
+
+                if (sidebar.style.width === "250px") {
+                    sidebar.style.width = "0px";
+                    content.style.marginLeft = "0px";
+                } else {
+                    sidebar.style.width = "250px";
+                    sidebar.style.display = "block";
+                    content.style.marginLeft = "250px";
+                }
+            }
+
+            function logout() {
+                localStorage.removeItem("session");
+                // Tambahkan logika logout di sini
+                alert("Anda berhasil logout");
+                window.location.href = "../auth/login.html";
+            }
+
+            function editRow() {
+                // Logika untuk mengedit baris
+                console.log("Edit button clicked");
+            }
+
+            function deleteRow() {
+                // Logika untuk menghapus baris
+                console.log("Delete button clicked");
+            }
+
+            function getArticlesFromLocalStorage() {
+                const articlesJSON = localStorage.getItem("articles");
+                return articlesJSON ? JSON.parse(articlesJSON) : [];
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const sessionUser = getUserFromSession();
+
+                if (!sessionUser) {
+                    alert(
+                        "Sesi Anda telah berakhir, Anda harus login terlebih dahulu!"
+                    );
+                    window.location.href = "../auth/login.html";
+                }
+            });
+
+            function getUserFromSession() {
+                const sessionJSON = localStorage.getItem("session");
+                return sessionJSON ? JSON.parse(sessionJSON) : null;
+            }
+        </script>
+    </body>
+</html>

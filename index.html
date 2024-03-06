@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="styles/index.css" />
+        <title>Mahir Blog</title>
+    </head>
+    <body>
+        <div class="wrap">
+            <div class="navbar">
+                <div class="container">
+                    <h2 class="logo">Mahir Blog</h2>
+                    <div class="navigasi" id="navigasi">
+                        <div id="buttonAction">
+                            <a href="./auth/login.html" class="btn-login"
+                                >Masuk</a
+                            >
+                            <a href="./auth/register.html" class="btn-register"
+                                >Daftar Gratis</a
+                            >
+                        </div>
+                        <input
+                            type="search"
+                            name="search"
+                            id="search"
+                            class="search"
+                            placeholder="Cari" />
+                    </div>
+                </div>
+            </div>
+            <main>
+                <div class="container" id="container"></div>
+            </main>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const articles = getArticlesFromLocalStorage();
+
+                const container = document.getElementById("container");
+
+                articles.forEach((article, index) => {
+                    const blogPost = document.createElement("div");
+                    blogPost.classList = "blog-post";
+                    blogPost.innerHTML = `
+                        <h2 class="title" id="title">
+                            ${article.title}
+                        </h2>
+                        <p class="article" id="article">
+                            ${article.article}
+                        </p>
+                        <div class="credit">
+                            <span class="author">By ${article.author}</span> |
+                            <span class="date">${article.date}</span>
+                        </div>
+                        `;
+
+                    container.append(blogPost);
+                });
+
+                const buttonAction = document.getElementById("buttonAction");
+                const dashboard = document.createElement("a");
+                dashboard.innerText = "Dashboard";
+                dashboard.href = "./admin/dashboard.html";
+                dashboard.style.padding = "8px 13px";
+                dashboard.style.backgroundColor = "blue";
+                dashboard.style.color = "white";
+                dashboard.style.borderRadius = "4px";
+                dashboard.style.textDecoration = "none";
+                const navigasi = document.getElementById("navigasi");
+                const sessionUser = getSessionFromLocalStorage();
+
+                if (sessionUser) {
+                    buttonAction.style.display = "none";
+                    navigasi.append(dashboard);
+                } else {
+                    buttonAction.style.display = "flex";
+                }
+            });
+
+            function getSessionFromLocalStorage() {
+                const sessionUser = localStorage.getItem("session");
+                return sessionUser ? JSON.parse(sessionUser) : null;
+            }
+
+            function getArticlesFromLocalStorage() {
+                const articlesJSON = localStorage.getItem("articles");
+                return articlesJSON ? JSON.parse(articlesJSON) : [];
+            }
+        </script>
+    </body>
+</html>

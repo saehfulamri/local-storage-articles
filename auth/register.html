@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="../styles/register.css" />
+        <title>Login into your accout - Mahir Blog</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="wrap-form">
+                <a class="logo" href="../index.html"><h1>Mahir Blog</h1></a>
+                <div>
+                    <h3>Create your account</h3>
+                    <form id="registerForm">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            autocomplete="email"
+                            required
+                            placeholder="Masukkan email" />
+                        <label for="password">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Masukkan password"
+                            autocomplete="current-password" />
+
+                        <input type="submit" value="Register" />
+                    </form>
+                    <span class="register"
+                        >Sudah punya akun? <a href="login.html">Masuk</a></span
+                    >
+                </div>
+            </div>
+            <div class="wrap-img">
+                <img src="../assets/register-image.svg" alt="" />
+            </div>
+        </div>
+        <script>
+            const registerForm = document.getElementById("registerForm");
+
+            registerForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+
+                const emailInput = document.getElementById("email");
+                const passwordInput = document.getElementById("password");
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (email !== "" || password !== "") {
+                    const users = getUsersFromLocalStorage();
+
+                    const cekEmail = users.some((user) => user.email === email);
+
+                    if (cekEmail) {
+                        alert(
+                            "Pendaftaran gagal! Email sudah terdaftar, gunakan email yang lain."
+                        );
+                    } else {
+                        users.push({
+                            email: email,
+                            password: password,
+                        });
+
+                        saveUsersToLocalStorage(users);
+                        alert("Pendaftaran user berhasil");
+                        window.location.href = "./login.html";
+                    }
+                    document.forms["registerForm"].reset();
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const sessionUser = getUserFromSession();
+
+                if (sessionUser) {
+                    window.location.href = "../admin/dashboard.html";
+                }
+            });
+
+            function saveUsersToLocalStorage(arg) {
+                localStorage.setItem("users", JSON.stringify(arg));
+            }
+
+            function getUsersFromLocalStorage() {
+                const usersJSON = localStorage.getItem("users");
+                return usersJSON ? JSON.parse(usersJSON) : [];
+            }
+
+            function getUserFromSession() {
+                const sessionJSON = localStorage.getItem("session");
+                return sessionJSON ? JSON.parse(sessionJSON) : null;
+            }
+        </script>
+    </body>
+</html>
